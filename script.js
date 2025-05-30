@@ -1,4 +1,6 @@
+
 const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec"; // Replace with your deployed Google Apps Script Web App URL
+
 
 async function safeFetchJSON(url) {
   const res = await fetch(url);
@@ -275,4 +277,7 @@ async function renderDashboard() {
   });
 }
 
-window.renderDashboard = renderDashboard;
+window.renderDashboard = renderDashboard;}
+}
+}
+}
