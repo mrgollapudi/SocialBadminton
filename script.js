@@ -1,3 +1,4 @@
+
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -153,3 +154,11 @@ async function generateBills() {
     billList.appendChild(li);
   }
 }
+
+
+window.addPlayers = addPlayers;
+window.deletePlayer = deletePlayer;
+window.applyMonthlyFee = applyMonthlyFee;
+window.toggleShowPast = toggleShowPast;
+window.generateBills = generateBills;
+window.renderAttendanceTable = renderAttendanceTable;
