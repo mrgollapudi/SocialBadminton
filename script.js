@@ -161,7 +161,7 @@ async function renderAttendanceTable() {
         const updated = snap.exists() ? snap.data() : {};
         updated[player] = cb.checked;
         await setDoc(docRef, updated);
-      });
+      };
       const td = document.createElement("td");
       td.appendChild(cb);
       row.appendChild(td);
