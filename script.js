@@ -1,6 +1,18 @@
 
 const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec"; // Replace with your deployed Google Apps Script Web App URL
 
+
+async function safeFetchJSON(url) {
+  const res = await fetch(url);
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("Failed to parse JSON from:", url, "\nResponse was:", text);
+    return [];
+  }
+}
+
 // Utility: Format month
 function formatMonth(year, month) {
   return `${year}-${String(month).padStart(2, "0")}`;
@@ -8,18 +20,15 @@ function formatMonth(year, month) {
 
 // Load helpers
 async function loadPlayers() {
-  const res = await fetch(`${API_URL}?action=getPlayers`);
-  return await res.json();
+  return await safeFetchJSON(`${API_URL}?action=getPlayers`);
 }
 
 async function loadAttendance() {
-  const res = await fetch(`${API_URL}?action=getAttendance`);
-  return await res.json();
+  return await safeFetchJSON(`${API_URL}?action=getAttendance`);
 }
 
 async function loadFees() {
-  const res = await fetch(`${API_URL}?action=getFees`);
-  return await res.json();
+  return await safeFetchJSON(`${API_URL}?action=getFees`);
 }
 
 // UI rendering
@@ -171,7 +180,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await renderPlayerList();
   await renderFeesTable();
   await renderAttendanceTable();
-  document.querySelector('a[href="#dashboardTab"]')?.addEventListener("click", renderDashboard);
+  // renderDashboard function not defined yet
 });
 
 // expose globally for buttons
