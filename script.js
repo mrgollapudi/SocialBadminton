@@ -1,4 +1,3 @@
-
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -355,3 +354,13 @@ function populateBillingSelectors() {
     monthSel.appendChild(new Option(m, i));
   });
 }
+
+window.addPlayers = addPlayers;
+window.deletePlayer = deletePlayer;
+window.applyMonthlyFee = applyMonthlyFee;
+window.toggleShowPast = toggleShowPast;
+window.generateBills = generateBills;
+window.renderAttendanceTable = renderAttendanceTable;
+window.renderPlayerList = renderPlayerList;
+window.renderDashboard = renderDashboard;
+window.generateMonthlyBills = generateMonthlyBills;
