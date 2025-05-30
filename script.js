@@ -1,11 +1,15 @@
 
+
 function toAESTDateString(date) {
-  return new Intl.DateTimeFormat('en-AU', {
+  const [d, m, y] = new Intl.DateTimeFormat('en-AU', {
     timeZone: 'Australia/Sydney',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
-  }).format(date).split('/').reverse().join('-');
+  }).format(new Date(date)).split('/');
+  return `${y}-${m}`;
+}
+).format(date).split('/').reverse().join('-');
 }
 
 
@@ -86,23 +90,24 @@ async function deletePlayer(name, mobile) {
 
 
 
-async function renderFeesTable() {
-  const fees = await loadFees();
-  const container = document.getElementById("feesTableContainer");
-  container.innerHTML = "";
-  const table = document.createElement("table");
-  table.className = "table table-bordered table-striped";
-  table.innerHTML = `
-    <thead>
-      <tr><th>Month</th><th>Regular</th><th>Casual</th></tr>
-    </thead>
-    <tbody>
-      ${fees.map(fee => `
-        <tr><td>${fee.month}</td><td>${fee.regular}</td><td>${fee.casual}</td></tr>
-      `).join("")}
-    </tbody>
-  `;
-  container.appendChild(table);
+async function 
+renderFeesTable() {
+  loadFees().then(fees => {
+    const container = document.getElementById("feesTableContainer");
+    container.innerHTML = "";
+    const table = document.createElement("table");
+    table.className = "table table-bordered table-striped";
+    table.innerHTML = `
+      <thead><tr><th>Month</th><th>Regular</th><th>Casual</th></tr></thead>
+      <tbody>
+        ${fees.map(f => `
+          <tr><td>${toAESTDateString(f.month)}</td><td>${f.regular}</td><td>${f.casual}</td></tr>
+        `).join("")}
+      </tbody>
+    `;
+    container.appendChild(table);
+  });
+
 
 }
 
@@ -235,4 +240,4 @@ window.renderPlayerList = renderPlayerList;
 window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
 window.generateMonthlyBills = generateMonthlyBills;
-//1:30
+//1:40
