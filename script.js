@@ -319,3 +319,93 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+async function renderDashboard() {
+  const container = document.getElementById("dashboardTableContainer");
+  const chartCanvas = document.getElementById("attendanceChart");
+  container.innerHTML = "";
+  if (!chartCanvas) return;
+
+  const attendanceSnap = await getDocs(collection(db, "attendance"));
+  const summary = {};
+  const monthlySummary = {};
+
+  attendanceSnap.forEach(doc => {
+    const date = doc.id;
+    const data = doc.data();
+    const count = Object.values(data).filter(v => v === true).length;
+    summary[date] = count;
+
+    const [year, month] = date.split("-").slice(0, 2);
+    const monthKey = `${year}-${month}`;
+    if (!monthlySummary[monthKey]) monthlySummary[monthKey] = 0;
+    monthlySummary[monthKey] += count;
+  });
+
+  // Table
+  const table = document.createElement("table");
+  table.className = "table table-striped";
+  table.innerHTML = "<thead><tr><th>Date</th><th>Attendance Count</th></tr></thead>";
+  const tbody = document.createElement("tbody");
+
+  Object.keys(summary).sort().forEach(date => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${date}</td><td>${summary[date]}</td>`;
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  container.appendChild(table);
+
+  // Graph
+  const ctx = chartCanvas.getContext("2d");
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(monthlySummary).sort(),
+      datasets: [{
+        label: 'Monthly Attendance Count',
+        data: Object.values(monthlySummary),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+// Fix generateBills to only use casual fee * days
+async function generateBills() {
+  const year = document.getElementById("yearSelect").value;
+  const month = document.getElementById("monthSelect").value;
+  const dateKeys = getAllTuesdays(year, month).map(d => d.toISOString().split("T")[0]);
+  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${month}`));
+  const casualFee = feeSnap.exists() ? (feeSnap.data().casual || 13) : 13;
+  const playerSnap = await getDocs(collection(db, "players"));
+  const billList = document.getElementById("billList");
+  billList.innerHTML = "";
+
+  for (const playerDoc of playerSnap.docs) {
+    const player = playerDoc.id;
+    let attended = 0;
+    for (const date of dateKeys) {
+      const snap = await getDoc(doc(db, "attendance", date));
+      if (snap.exists() && snap.data()[player]) attended++;
+    }
+    const total = attended * casualFee;
+    const li = document.createElement("li");
+    li.className = "list-group-item";
+    li.textContent = `${player}: $${total.toFixed(2)} (${attended} days × $${casualFee})`;
+    billList.appendChild(li);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const dashboardTab = document.querySelector('a[href="#dashboardTab"]');
+  dashboardTab?.addEventListener("click", () => {
+    renderDashboard();
+  });
+});
