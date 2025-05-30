@@ -45,13 +45,16 @@ async function renderPlayerList() {
 
 async function renderFeesTable() {
   const fees = await loadFees();
+  const year = document.getElementById("feeYear").value;
+  const month = String(document.getElementById("feeMonth").value).padStart(2, "0");
+  const selected = `${year}-${month}`;
   const container = document.getElementById("feesTableContainer");
   container.innerHTML = "";
   const table = document.createElement("table");
   table.className = "table table-bordered";
   table.innerHTML = `
     <thead><tr><th>Month</th><th>Regular</th><th>Casual</th></tr></thead>
-    <tbody>${fees.map(f => `
+    <tbody>${fees.filter(f => f.month === selected).map(f => `
       <tr><td>${f.month}</td><td>${f.regular}</td><td>${f.casual}</td></tr>
     `).join("")}</tbody>
   `;
@@ -63,7 +66,7 @@ async function renderAttendanceTable() {
   const month = document.getElementById("monthSelect").value;
   const players = await loadPlayers();
   const attendance = await loadAttendance();
-  const tuesdays = getAllTuesdays(year, month);
+  const tuesdays = getAllTuesdays(parseInt(year), parseInt(month));
   const container = document.getElementById("attendanceTableContainer");
   container.innerHTML = "";
 
@@ -99,7 +102,7 @@ async function renderAttendanceTable() {
   container.appendChild(table);
 }
 
-function getAllTuesdays(year, month) {
+function getAllTuesdays(parseInt(year), parseInt(month)) {
   const result = [];
   const d = new Date(year, month, 1);
   while (d.getMonth() === parseInt(month)) {
@@ -126,7 +129,7 @@ async function applyMonthlyFee() {
   const month = document.getElementById("feeMonth").value;
   const regular = document.getElementById("regularFee").value;
   const casual = document.getElementById("casualFee").value;
-  const monthKey = formatMonth(year, month);
+  const monthKey = formatMonth(year, String(month).padStart(2, "0"));
   await fetch(`${API_URL}?action=applyFee&month=${monthKey}&regular=${regular}&casual=${casual}`);
   alert("Fee saved.");
   renderFeesTable();
@@ -135,8 +138,8 @@ async function applyMonthlyFee() {
 async function generateMonthlyBills() {
   const year = document.getElementById("billingYearSelect").value;
   const month = document.getElementById("billingMonthSelect").value;
-  const monthKey = formatMonth(year, month);
-  const tuesdays = getAllTuesdays(year, month);
+  const monthKey = formatMonth(year, String(month).padStart(2, "0"));
+  const tuesdays = getAllTuesdays(parseInt(year), parseInt(month));
   const players = await loadPlayers();
   const attendance = await loadAttendance();
   const fees = await loadFees();
@@ -200,3 +203,4 @@ window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
 window.applyMonthlyFee = applyMonthlyFee;
 window.generateMonthlyBills = generateMonthlyBills;
+//12:20AM
