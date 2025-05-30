@@ -42,7 +42,7 @@ async function addPlayers() {
       alert(`Mobile number "${mobile}" is already in use.`);
       continue;
     }
-    await setDoc(doc(db, "players", name), { name, mobile };
+    await setDoc(doc(db, "players", name), { name, mobile });
     await setDoc(doc(db, "players", name), { name, mobile });
     console.log(`Added: ${name} (${mobile})`);
 
