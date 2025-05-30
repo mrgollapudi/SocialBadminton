@@ -28,7 +28,7 @@ async function addPlayers() {
   const existing = {};
   existingSnap.forEach(doc => {
     existing[doc.id] = doc.data().mobile;
-  });
+  };
 
   for (let i = 0; i < names.length; i++) {
     const name = names[i];
@@ -41,8 +41,8 @@ async function addPlayers() {
       alert(`Mobile number "${mobile}" is already in use.`);
       continue;
     }
-    await setDoc(doc(db, "players", name), { name, mobile });
-    console.log(`Added: ${name} (${mobile})`);
+    await setDoc(doc(db, "players", name), { name, mobile };
+    console.log(`Added: ${name} (${mobile}`);
   }
 
   document.getElementById("playerInput").value = "";
@@ -67,14 +67,14 @@ async function renderPlayerList() {
     const { name, mobile } = docSnap.data();
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
-    li.textContent = `${name} (${mobile})`;
+    li.textContent = `${name} (${mobile}`;
     const btn = document.createElement("button");
     btn.className = "btn btn-sm btn-danger";
     btn.textContent = "Delete";
     btn.onclick = () => deletePlayer(name);
     li.appendChild(btn);
     ul.appendChild(li);
-  });
+  };
 }
 
 function populateSelectors() {
@@ -97,7 +97,7 @@ function populateSelectors() {
     const opt2 = new Option(m, i);
     mSel.appendChild(opt1);
     mAttSel.appendChild(opt2);
-  });
+  };
 }
 
 function toggleShowPast() {
@@ -136,7 +136,7 @@ async function renderAttendanceTable() {
       headRow.innerHTML += `<th>${dateStr}</th>`;
       visibleDates.push(dateStr);
     }
-  });
+  };
 
   thead.appendChild(headRow);
   table.appendChild(thead);
@@ -181,7 +181,7 @@ async function applyMonthlyFee() {
     alert("Please enter valid fees.");
     return;
   }
-  await setDoc(doc(db, "monthlyFees", `${y}-${m}`), { regular: r, casual: c });
+  await setDoc(doc(db, "monthlyFees", `${y}-${m}`), { regular: r, casual: c };
   alert("Fees updated.");
 }
 
@@ -206,7 +206,7 @@ async function generateBills() {
     const total = isRegular ? fees.regular : attended * fees.casual;
     const li = document.createElement("li");
     li.className = "list-group-item";
-    li.textContent = `${player}: $${total.toFixed(2)} (${attended}/${dateKeys.length})`;
+    li.textContent = `${player}: $${total.toFixed(2)} (${attended}/${dateKeys.length}`;
     billList.appendChild(li);
   }
 }
@@ -251,7 +251,7 @@ window.addEventListener("DOMContentLoaded", () => {
   renderPlayerList();
   renderAttendanceTable();
   loadMonthlyFee();
-});
+};
 
 );
 
@@ -259,8 +259,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const dashboardTab = document.querySelector('a[href="#dashboardTab"]');
   dashboardTab?.addEventListener("click", () => {
     renderDashboard();
-  });
-});
+  };
+};
 
 async function renderDashboard() {
   const container = document.getElementById("dashboardTableContainer");
@@ -282,7 +282,7 @@ async function renderDashboard() {
     const monthKey = `${year}-${month}`;
     if (!monthlySummary[monthKey]) monthlySummary[monthKey] = 0;
     monthlySummary[monthKey] += count;
-  });
+  };
 
   const table = document.createElement("table");
   table.className = "table table-striped";
@@ -293,7 +293,7 @@ async function renderDashboard() {
     const row = document.createElement("tr");
     row.innerHTML = `<td>${date}</td><td>${summary[date]}</td>`;
     tbody.appendChild(row);
-  });
+  };
   table.appendChild(tbody);
   container.appendChild(table);
 
@@ -314,7 +314,7 @@ async function renderDashboard() {
         y: { beginAtZero: true }
       }
     }
-  });
+  };
 }
 
 async function generateBills() {
@@ -337,7 +337,7 @@ async function generateBills() {
     const total = attended * casualFee;
     const li = document.createElement("li");
     li.className = "list-group-item";
-    li.textContent = `${player}: $${total.toFixed(2)} (${attended} days × $${casualFee})`;
+    li.textContent = `${player}: $${total.toFixed(2)} (${attended} days × $${casualFee}`;
     billList.appendChild(li);
   }
 }
@@ -346,5 +346,5 @@ document.addEventListener("DOMContentLoaded", () => {
   const dashboardTab = document.querySelector('a[href="#dashboardTab"]');
   dashboardTab?.addEventListener("click", () => {
     renderDashboard();
-  });
-});
+  };
+};
