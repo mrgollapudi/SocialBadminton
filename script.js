@@ -32,27 +32,46 @@ async function renderPlayerList() {
   const table = document.getElementById("playerListTable");
   table.innerHTML = "";
 
-  // Create table headers
+  // Create table header
   const thead = document.createElement("thead");
   thead.innerHTML = `
     <tr class="table-primary">
       <th>Player Name</th>
       <th>Mobile</th>
+      <th>Action</th>
     </tr>
   `;
   table.appendChild(thead);
 
-  // Create table body
+  // Load and sort players alphabetically by name
+  const players = (await loadPlayers()).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  // Create body
   const tbody = document.createElement("tbody");
-  const players = await loadPlayers();
 
   players.forEach(({ name, mobile }) => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${name}</td><td>${mobile}</td>`;
+    row.innerHTML = `
+      <td>${name}</td>
+      <td>${mobile}</td>
+      <td>
+        <button class="btn btn-sm btn-danger" onclick="deletePlayer('${name}', '${mobile}')">
+          Delete
+        </button>
+      </td>
+    `;
     tbody.appendChild(row);
   });
 
   table.appendChild(tbody);
+}
+
+async function deletePlayer(name, mobile) {
+  if (!confirm(`Delete ${name}?`)) return;
+  await fetch(`${API_URL}?action=deletePlayer&name=${encodeURIComponent(name)}&mobile=${encodeURIComponent(mobile)}`);
+  await renderPlayerList();
 }
 
 
