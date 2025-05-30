@@ -37,10 +37,9 @@ async function renderPlayerList() {
   list.innerHTML = "";
   const players = await loadPlayers();
   players.forEach(({ name, mobile }) => {
-    const li = document.createElement("li");
-    li.className = "list-group-item d-flex justify-content-between align-items-center";
-    li.textContent = `${name} (${mobile})`;
-    list.appendChild(li);
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${name}</td><td>${mobile}</td>`;
+    list.appendChild(row);
   });
 }
 
@@ -105,6 +104,7 @@ function getAllTuesdays(year, month) {
   const d = new Date(year, month, 1);
   while (d.getMonth() === parseInt(month)) {
     if (d.getDay() === 2) {
+      result.push(new Date(d).toISOString().split('T')[0]);
       result.push(d.toISOString().split("T")[0]);
     }
     d.setDate(d.getDate() + 1);
@@ -171,6 +171,17 @@ function populateSelectors() {
   const months = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
   months.forEach((m, i) => {
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  if (yearSel) yearSel.value = currentYear;
+  if (monthSel) monthSel.value = currentMonth;
+  if (fy) fy.value = currentYear;
+  if (fm) fm.value = currentMonth;
+  if (by) by.value = currentYear;
+  if (bm) bm.value = currentMonth;
+
     [monthSel, fm, bm].forEach(sel => sel?.appendChild(new Option(m, i)));
   });
 }
