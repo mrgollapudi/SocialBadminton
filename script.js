@@ -1,15 +1,12 @@
 function toAESTDateString(date) {
-  const [d, m, y] = new Intl.DateTimeFormat('en-AU', {
+  const [day, month, year] = new Intl.DateTimeFormat('en-AU', {
     timeZone: 'Australia/Sydney',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
   }).format(new Date(date)).split('/');
-  return `${y}-${m}`;
+  return `${year}-${month}`;
 }
-.format(date).split('/').reverse().join('-');
-}
-
 
 const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec";
 
