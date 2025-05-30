@@ -103,7 +103,6 @@ async function renderFeesTable() {
     </tbody>
   `;
   container.appendChild(table);
-}
 
 }
 
@@ -236,4 +235,4 @@ window.renderPlayerList = renderPlayerList;
 window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
 window.generateMonthlyBills = generateMonthlyBills;
-//1:26AM
+//1:30
