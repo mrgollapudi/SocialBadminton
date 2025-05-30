@@ -172,7 +172,7 @@ async function applyMonthlyFee() {
     alert("Please enter valid fees.");
     return;
   }
-  await setDoc(doc(db, "monthlyFees", `${y}-${m}`), { regular: r, casual: c });
+  await setDoc(doc(db, "monthlyFees", `${y}-${String(m).padStart(2, "0")}`), { regular: r, casual: c });
   alert("Fees updated.");
   renderFeesTable();
 }
@@ -181,7 +181,7 @@ async function generateBills() {
   const year = document.getElementById("yearSelect").value;
   const month = document.getElementById("monthSelect").value;
   const dateKeys = getAllTuesdays(year, month).map(d => d.toISOString().split("T")[0]);
-  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${month}`));
+  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${String(month).padStart(2, "0")}`));
   const casualFee = feeSnap.exists() ? (feeSnap.data().casual || 13) : 13;
   const playerSnap = await getDocs(collection(db, "players"));
   const billList = document.getElementById("billList");
@@ -205,7 +205,7 @@ async function generateBills() {
 async function loadMonthlyFee() {
   const year = document.getElementById("feeYear").value;
   const month = document.getElementById("feeMonth").value;
-  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${month}`));
+  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${String(month).padStart(2, "0")}`));
   if (feeSnap.exists()) {
     const { regular, casual } = feeSnap.data();
     document.getElementById("regularFee").value = regular;
@@ -240,7 +240,7 @@ async function renderDashboard() {
     summary[date] = count;
 
     const [year, month] = date.split("-").slice(0, 2);
-    const monthKey = `${year}-${month}`;
+    const monthKey = `${year}-${String(month).padStart(2, "0")}`;
     if (!monthlySummary[monthKey]) monthlySummary[monthKey] = 0;
     monthlySummary[monthKey] += count;
   });
@@ -321,7 +321,7 @@ async function generateMonthlyBills() {
   const year = document.getElementById("billingYearSelect").value;
   const month = document.getElementById("billingMonthSelect").value;
   const dateKeys = getAllTuesdays(year, month).map(d => d.toISOString().split("T")[0]);
-  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${month}`));
+  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${String(month).padStart(2, "0")}`));
   const casualFee = feeSnap.exists() ? (feeSnap.data().casual || 13) : 13;
   const playerSnap = await getDocs(collection(db, "players"));
   const resultList = document.getElementById("billingResultList");
