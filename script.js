@@ -1,4 +1,3 @@
-
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -6,14 +5,48 @@ import {
 const db = window.db;
 let showPast = false;
 
+function capitalizeName(name) {
+  return name
+    .split(" ")
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
 async function addPlayers() {
-  const input = document.getElementById("playerInput");
-  const names = input.value.split(",").map(n => n.trim()).filter(n => n);
-  for (const name of names) {
-    await setDoc(doc(db, "players", name), { name });
-    console.log(`Player "${name}" added to Firestore.`);
+  const nameInput = document.getElementById("playerInput").value.trim();
+  const mobileInput = document.getElementById("mobileInput").value.trim();
+
+  const names = nameInput.split(",").map(n => capitalizeName(n.trim()));
+  const mobiles = mobileInput.split(",").map(m => m.trim());
+
+  if (names.length !== mobiles.length) {
+    alert("Please ensure each name has a corresponding mobile number.");
+    return;
   }
-  input.value = "";
+
+  const existingSnap = await getDocs(collection(db, "players"));
+  const existing = {};
+  existingSnap.forEach(doc => {
+    existing[doc.id] = doc.data().mobile;
+  });
+
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    const mobile = mobiles[i];
+    if (existing[name]) {
+      alert(`Player "${name}" already exists.`);
+      continue;
+    }
+    if (Object.values(existing).includes(mobile)) {
+      alert(`Mobile number "${mobile}" is already in use.`);
+      continue;
+    }
+    await setDoc(doc(db, "players", name), { name, mobile });
+    console.log(`Added: ${name} (${mobile})`);
+  }
+
+  document.getElementById("playerInput").value = "";
+  document.getElementById("mobileInput").value = "";
   renderPlayerList();
   renderAttendanceTable();
 }
@@ -21,7 +54,6 @@ async function addPlayers() {
 async function deletePlayer(name) {
   if (confirm("Delete player " + name + "?")) {
     await deleteDoc(doc(db, "players", name));
-    console.log(`Player "${name}" deleted from Firestore.`);
     renderPlayerList();
     renderAttendanceTable();
   }
@@ -32,16 +64,39 @@ async function renderPlayerList() {
   ul.innerHTML = "";
   const snapshot = await getDocs(collection(db, "players"));
   snapshot.forEach(docSnap => {
-    const name = docSnap.id;
+    const { name, mobile } = docSnap.data();
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
-    li.textContent = name;
+    li.textContent = `${name} (${mobile})`;
     const btn = document.createElement("button");
     btn.className = "btn btn-sm btn-danger";
     btn.textContent = "Delete";
     btn.onclick = () => deletePlayer(name);
     li.appendChild(btn);
     ul.appendChild(li);
+  });
+}
+
+function populateSelectors() {
+  const ySel = document.getElementById("feeYear");
+  const mSel = document.getElementById("feeMonth");
+  const yAttSel = document.getElementById("yearSelect");
+  const mAttSel = document.getElementById("monthSelect");
+
+  for (let y = 2025; y <= 2027; y++) {
+    const opt1 = new Option(y, y);
+    const opt2 = new Option(y, y);
+    ySel.appendChild(opt1);
+    yAttSel.appendChild(opt2);
+  }
+
+  const months = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  months.forEach((m, i) => {
+    const opt1 = new Option(m, i);
+    const opt2 = new Option(m, i);
+    mSel.appendChild(opt1);
+    mAttSel.appendChild(opt2);
   });
 }
 
@@ -69,11 +124,12 @@ async function renderAttendanceTable() {
   container.innerHTML = "";
   const table = document.createElement("table");
   table.className = "table table-bordered";
+
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
   headRow.innerHTML = "<th>Player</th>";
-
   const visibleDates = [];
+
   tuesdays.forEach(date => {
     const dateStr = date.toISOString().split("T")[0];
     if (showPast || dateStr <= today) {
@@ -81,28 +137,29 @@ async function renderAttendanceTable() {
       visibleDates.push(dateStr);
     }
   });
+
   thead.appendChild(headRow);
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
-  const playerSnap = await getDocs(collection(db, "players"));
-  for (const playerDoc of playerSnap.docs) {
+  const playersSnap = await getDocs(collection(db, "players"));
+  for (const playerDoc of playersSnap.docs) {
     const player = playerDoc.id;
     const row = document.createElement("tr");
     row.innerHTML = `<td>${player}</td>`;
+
     for (const date of visibleDates) {
       const cb = document.createElement("input");
       cb.type = "checkbox";
       const docRef = doc(db, "attendance", date);
-      const attSnap = await getDoc(docRef);
-      const data = attSnap.exists() ? attSnap.data() : {};
+      const snap = await getDoc(docRef);
+      const data = snap.exists() ? snap.data() : {};
       cb.checked = data[player] || false;
       cb.disabled = new Date(date) > new Date();
       cb.onchange = async () => {
-        const update = { ...(attSnap.exists() ? attSnap.data() : {}) };
-        update[player] = cb.checked;
-        await setDoc(docRef, update);
-        console.log(`Attendance for ${player} on ${date}: ${cb.checked}`);
+        const updated = snap.exists() ? snap.data() : {};
+        updated[player] = cb.checked;
+        await setDoc(docRef, updated);
       };
       const td = document.createElement("td");
       td.appendChild(cb);
@@ -126,7 +183,6 @@ async function applyMonthlyFee() {
   }
   await setDoc(doc(db, "monthlyFees", `${y}-${m}`), { regular: r, casual: c });
   alert("Fees updated.");
-  console.log(`Monthly fee updated: ${y}-${m} => Regular: $${r}, Casual: $${c}`);
 }
 
 async function generateBills() {
@@ -155,10 +211,12 @@ async function generateBills() {
   }
 }
 
-
+// Run setup when page loads
+populateSelectors();
 window.addPlayers = addPlayers;
 window.deletePlayer = deletePlayer;
 window.applyMonthlyFee = applyMonthlyFee;
 window.toggleShowPast = toggleShowPast;
 window.generateBills = generateBills;
 window.renderAttendanceTable = renderAttendanceTable;
+window.renderPlayerList = renderPlayerList;
