@@ -29,15 +29,32 @@ async function loadFees() {
 }
 
 async function renderPlayerList() {
-  const list = document.getElementById("playerList");
-  list.innerHTML = "";
+  const table = document.getElementById("playerListTable");
+  table.innerHTML = "";
+
+  // Create table headers
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr class="table-primary">
+      <th>Player Name</th>
+      <th>Mobile</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+
+  // Create table body
+  const tbody = document.createElement("tbody");
   const players = await loadPlayers();
+
   players.forEach(({ name, mobile }) => {
     const row = document.createElement("tr");
     row.innerHTML = `<td>${name}</td><td>${mobile}</td>`;
-    list.appendChild(row);
+    tbody.appendChild(row);
   });
+
+  table.appendChild(tbody);
 }
+
 
 async function renderFeesTable() {
   const fees = await loadFees();
