@@ -77,16 +77,13 @@ async function deletePlayer(name, mobile) {
 
 async function renderFeesTable() {
   const fees = await loadFees();
-  const year = document.getElementById("feeYear").value;
-  const month = String(document.getElementById("feeMonth").value).padStart(2, "0");
-  const selected = `${year}-${month}`;
   const container = document.getElementById("feesTableContainer");
   container.innerHTML = "";
   const table = document.createElement("table");
   table.className = "table table-bordered";
   table.innerHTML = `
     <thead><tr><th>Month</th><th>Regular</th><th>Casual</th></tr></thead>
-    <tbody>${fees.filter(f => f.month === selected).map(f => `
+    <tbody>${fees.map(f => `
       <tr><td>${f.month}</td><td>${f.regular}</td><td>${f.casual}</td></tr>
     `).join("")}</tbody>
   `;
