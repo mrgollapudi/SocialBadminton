@@ -1,3 +1,4 @@
+
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -220,3 +221,35 @@ window.toggleShowPast = toggleShowPast;
 window.generateBills = generateBills;
 window.renderAttendanceTable = renderAttendanceTable;
 window.renderPlayerList = renderPlayerList;
+
+
+async function loadMonthlyFee() {
+  const year = document.getElementById("feeYear").value;
+  const month = document.getElementById("feeMonth").value;
+  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${month}`));
+  if (feeSnap.exists()) {
+    const { regular, casual } = feeSnap.data();
+    document.getElementById("regularFee").value = regular;
+    document.getElementById("casualFee").value = casual;
+  } else {
+    document.getElementById("regularFee").value = 11;
+    document.getElementById("casualFee").value = 13;
+  }
+}
+
+// Add listeners to dropdowns to load fees
+function attachFeeDropdownListeners() {
+  const fy = document.getElementById("feeYear");
+  const fm = document.getElementById("feeMonth");
+  fy?.addEventListener("change", loadMonthlyFee);
+  fm?.addEventListener("change", loadMonthlyFee);
+}
+
+// Final load logic after DOM is ready
+window.addEventListener("DOMContentLoaded", () => {
+  populateSelectors();
+  attachFeeDropdownListeners();
+  renderPlayerList();
+  renderAttendanceTable();
+  loadMonthlyFee();
+});
