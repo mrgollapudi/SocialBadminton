@@ -175,6 +175,7 @@ async function applyMonthlyFee() {
   }
   await setDoc(doc(db, "monthlyFees", `${y}-${m}`), { regular: r, casual: c });
   alert("Fees updated.");
+  renderFeesTable();
 }
 
 async function generateBills() {
@@ -282,8 +283,35 @@ window.addEventListener("DOMContentLoaded", () => {
   renderPlayerList();
   renderAttendanceTable();
   loadMonthlyFee();
+  renderFeesTable();
   renderDashboard();
 
   const dashboardTab = document.querySelector('a[href="#dashboardTab"]');
   dashboardTab?.addEventListener("click", renderDashboard);
 });
+
+async function renderFeesTable() {
+  const container = document.getElementById("feesTableContainer");
+  container.innerHTML = "";
+
+  const feesSnap = await getDocs(collection(db, "monthlyFees"));
+  if (feesSnap.empty) {
+    container.textContent = "No fee data available.";
+    return;
+  }
+
+  const table = document.createElement("table");
+  table.className = "table table-striped table-bordered";
+  table.innerHTML = "<thead><tr><th>Month</th><th>Regular Fee</th><th>Casual Fee</th></tr></thead>";
+  const tbody = document.createElement("tbody");
+
+  feesSnap.forEach(docSnap => {
+    const row = document.createElement("tr");
+    const { regular, casual } = docSnap.data();
+    row.innerHTML = `<td>${docSnap.id}</td><td>$${regular}</td><td>$${casual}</td>`;
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
