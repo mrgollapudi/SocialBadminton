@@ -1,6 +1,4 @@
-# Updated and cleaned script.js with Firebase integration for proper data handling
 
-firebase_script_js = """
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -156,7 +154,3 @@ async function generateBills() {
     billList.appendChild(li);
   }
 }
-"""
-
-# Output the content so the user can copy/save it
-firebase_script_js
