@@ -1,5 +1,8 @@
+# Updated and cleaned script.js with Firebase integration for proper data handling
+
+firebase_script_js = """
 import {
-  getFirestore, collection, doc, getDoc, getDocs, setDoc
+  getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
 const db = window.db;
@@ -10,6 +13,7 @@ async function addPlayers() {
   const names = input.value.split(",").map(n => n.trim()).filter(n => n);
   for (const name of names) {
     await setDoc(doc(db, "players", name), { name });
+    console.log(`Player "${name}" added to Firestore.`);
   }
   input.value = "";
   renderPlayerList();
@@ -18,7 +22,8 @@ async function addPlayers() {
 
 async function deletePlayer(name) {
   if (confirm("Delete player " + name + "?")) {
-    await setDoc(doc(db, "players", name), {}); // overwrite to blank or you can use deleteDoc
+    await deleteDoc(doc(db, "players", name));
+    console.log(`Player "${name}" deleted from Firestore.`);
     renderPlayerList();
     renderAttendanceTable();
   }
@@ -99,6 +104,7 @@ async function renderAttendanceTable() {
         const update = { ...(attSnap.exists() ? attSnap.data() : {}) };
         update[player] = cb.checked;
         await setDoc(docRef, update);
+        console.log(`Attendance for ${player} on ${date}: ${cb.checked}`);
       };
       const td = document.createElement("td");
       td.appendChild(cb);
@@ -122,6 +128,7 @@ async function applyMonthlyFee() {
   }
   await setDoc(doc(db, "monthlyFees", `${y}-${m}`), { regular: r, casual: c });
   alert("Fees updated.");
+  console.log(`Monthly fee updated: ${y}-${m} => Regular: $${r}, Casual: $${c}`);
 }
 
 async function generateBills() {
@@ -149,3 +156,7 @@ async function generateBills() {
     billList.appendChild(li);
   }
 }
+"""
+
+# Output the content so the user can copy/save it
+firebase_script_js
