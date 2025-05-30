@@ -75,7 +75,7 @@ async function renderPlayerList() {
     btn.onclick = () => deletePlayer(name);
     li.appendChild(btn);
     ul.appendChild(li);
-  };
+  });
 }
 
 function populateSelectors() {
