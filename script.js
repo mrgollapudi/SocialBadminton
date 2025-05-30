@@ -1,4 +1,14 @@
 
+function toAESTDateString(date) {
+  return new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date).split('/').reverse().join('-');
+}
+
+
 const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec";
 
 async function safeFetchJSON(url) {
@@ -75,19 +85,26 @@ async function deletePlayer(name, mobile) {
 }
 
 
+
 async function renderFeesTable() {
   const fees = await loadFees();
   const container = document.getElementById("feesTableContainer");
   container.innerHTML = "";
   const table = document.createElement("table");
-  table.className = "table table-bordered";
+  table.className = "table table-bordered table-striped";
   table.innerHTML = `
-    <thead><tr><th>Month</th><th>Regular</th><th>Casual</th></tr></thead>
-    <tbody>${fees.map(f => `
-      <tr><td>${f.month}</td><td>${f.regular}</td><td>${f.casual}</td></tr>
-    `).join("")}</tbody>
+    <thead>
+      <tr><th>Month</th><th>Regular</th><th>Casual</th></tr>
+    </thead>
+    <tbody>
+      ${fees.map(fee => `
+        <tr><td>${fee.month}</td><td>${fee.regular}</td><td>${fee.casual}</td></tr>
+      `).join("")}
+    </tbody>
   `;
   container.appendChild(table);
+}
+
 }
 
 async function renderAttendanceTable() {
@@ -138,7 +155,7 @@ function getAllTuesdays(year, month) {
   const d = new Date(year, month, 1);
   while (d.getMonth() === month) {
     if (d.getDay() === 2) {
-      const dateStr = new Date(d).toISOString().split("T")[0];
+      const dateStr = toAESTDateString(new Date(d));
       result.push(dateStr);
     }
     d.setDate(d.getDate() + 1);
@@ -154,16 +171,6 @@ async function submitPlayer(name, mobile) {
   await fetch(`${API_URL}?action=addPlayer&name=${encodeURIComponent(name)}&mobile=${encodeURIComponent(mobile)}`);
 }
 
-async function applyMonthlyFee() {
-  const year = document.getElementById("feeYear").value;
-  const month = document.getElementById("feeMonth").value;
-  const regular = document.getElementById("regularFee").value;
-  const casual = document.getElementById("casualFee").value;
-  const monthKey = formatMonth(year, String(month).padStart(2, "0"));
-  await fetch(`${API_URL}?action=applyFee&month=${monthKey}&regular=${regular}&casual=${casual}`);
-  alert("Fee saved.");
-  renderFeesTable();
-}
 
 async function generateMonthlyBills() {
   const year = document.getElementById("billingYearSelect").value;
@@ -228,6 +235,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 window.renderPlayerList = renderPlayerList;
 window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
-window.applyMonthlyFee = applyMonthlyFee;
 window.generateMonthlyBills = generateMonthlyBills;
-//1:19am
+//1:26AM
