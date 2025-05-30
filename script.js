@@ -112,23 +112,13 @@ function getAllTuesdays(year, month) {
       const dateStr = new Date(d).toISOString().split("T")[0];
       result.push(dateStr);
     }
-    d.setDate(d.getDate() + 1);
-  }
-  return result;
-}
-    d.setDate(d.getDate() + 1);
-  }
-  return result;
-}
 
 // Submit helpers (mock only - requires Apps Script support for POST)
 async function submitAttendance(date, player, present) {
   await fetch(`${API_URL}?action=markAttendance&date=${date}&player=${player}&present=${present ? "Yes" : "No"}`);
-}
 
 async function submitPlayer(name, mobile) {
   await fetch(`${API_URL}?action=addPlayer&name=${encodeURIComponent(name)}&mobile=${encodeURIComponent(mobile)}`);
-}
 
 async function applyMonthlyFee() {
   const year = document.getElementById("feeYear").value;
@@ -209,4 +199,4 @@ window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
 window.applyMonthlyFee = applyMonthlyFee;
 window.generateMonthlyBills = generateMonthlyBills;
-//12:32am
+//12:36am
