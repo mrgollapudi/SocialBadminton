@@ -1,3 +1,4 @@
+
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -27,7 +28,7 @@ async function addPlayers() {
   const existingSnap = await getDocs(collection(db, "players"));
   const existing = {};
   existingSnap.forEach(doc => {
-    existing[doc.id] = doc.data().mobile;
+  });
   };
 
   for (let i = 0; i < names.length; i++) {
@@ -254,6 +255,8 @@ window.addEventListener("DOMContentLoaded", () => {
 };
 
 );
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const dashboardTab = document.querySelector('a[href="#dashboardTab"]');
