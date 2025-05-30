@@ -1,5 +1,3 @@
-
-
 function toAESTDateString(date) {
   const [d, m, y] = new Intl.DateTimeFormat('en-AU', {
     timeZone: 'Australia/Sydney',
@@ -9,7 +7,7 @@ function toAESTDateString(date) {
   }).format(new Date(date)).split('/');
   return `${y}-${m}`;
 }
-).format(date).split('/').reverse().join('-');
+.format(date).split('/').reverse().join('-');
 }
 
 
