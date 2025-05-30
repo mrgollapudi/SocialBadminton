@@ -230,4 +230,4 @@ window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
 window.applyMonthlyFee = applyMonthlyFee;
 window.generateMonthlyBills = generateMonthlyBills;
-//12:46
+//1:19am
