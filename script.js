@@ -1,6 +1,5 @@
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec"; // Replace with your deployed Google Apps Script Web App URL
-
+const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec";
 
 async function safeFetchJSON(url) {
   const res = await fetch(url);
@@ -13,12 +12,10 @@ async function safeFetchJSON(url) {
   }
 }
 
-// Utility: Format month
 function formatMonth(year, month) {
   return `${year}-${String(month).padStart(2, "0")}`;
 }
 
-// Load helpers
 async function loadPlayers() {
   return await safeFetchJSON(`${API_URL}?action=getPlayers`);
 }
@@ -31,7 +28,6 @@ async function loadFees() {
   return await safeFetchJSON(`${API_URL}?action=getFees`);
 }
 
-// UI rendering
 async function renderPlayerList() {
   const list = document.getElementById("playerList");
   list.innerHTML = "";
@@ -112,13 +108,18 @@ function getAllTuesdays(year, month) {
       const dateStr = new Date(d).toISOString().split("T")[0];
       result.push(dateStr);
     }
+    d.setDate(d.getDate() + 1);
+  }
+  return result;
+}
 
-// Submit helpers (mock only - requires Apps Script support for POST)
 async function submitAttendance(date, player, present) {
   await fetch(`${API_URL}?action=markAttendance&date=${date}&player=${player}&present=${present ? "Yes" : "No"}`);
+}
 
 async function submitPlayer(name, mobile) {
   await fetch(`${API_URL}?action=addPlayer&name=${encodeURIComponent(name)}&mobile=${encodeURIComponent(mobile)}`);
+}
 
 async function applyMonthlyFee() {
   const year = document.getElementById("feeYear").value;
@@ -170,6 +171,8 @@ function populateSelectors() {
   const months = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
   months.forEach((m, i) => {
+    [monthSel, fm, bm].forEach(sel => sel?.appendChild(new Option(m, i)));
+  });
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -180,9 +183,6 @@ function populateSelectors() {
   if (fm) fm.value = currentMonth;
   if (by) by.value = currentYear;
   if (bm) bm.value = currentMonth;
-
-    [monthSel, fm, bm].forEach(sel => sel?.appendChild(new Option(m, i)));
-  });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -190,13 +190,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   await renderPlayerList();
   await renderFeesTable();
   await renderAttendanceTable();
-  // renderDashboard function not defined yet
 });
 
-// expose globally for buttons
 window.renderPlayerList = renderPlayerList;
 window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
 window.applyMonthlyFee = applyMonthlyFee;
 window.generateMonthlyBills = generateMonthlyBills;
-//12:41am
+//12:46
