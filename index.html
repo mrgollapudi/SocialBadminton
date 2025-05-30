@@ -101,16 +101,15 @@
       projectId: "badminton-group-springfield",
       storageBucket: "badminton-group-springfield.firebasestorage.app",
       messagingSenderId: "483085704429",
-      appId: "1:483085704429:web:f0a07cb9aae99c960740e4",
-      measurementId: "G-D1YTHK4LHC"
+      appId: "1:483085704429:web:f0a07cb9aae99c960740e4"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    window.db = db; // Make db globally available to script.js
+    window.db = db;
   </script>
 
-  <!-- Your App Logic -->
+  <!-- Your main logic file -->
   <script type="module" src="./script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
