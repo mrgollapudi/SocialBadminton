@@ -98,7 +98,7 @@ function populateSelectors() {
     const opt2 = new Option(m, i);
     mSel.appendChild(opt1);
     mAttSel.appendChild(opt2);
-  };
+  });
 }
 
 function toggleShowPast() {
@@ -137,7 +137,7 @@ async function renderAttendanceTable() {
       headRow.innerHTML += `<th>${dateStr}</th>`;
       visibleDates.push(dateStr);
     }
-  };
+  });
 
   thead.appendChild(headRow);
   table.appendChild(thead);
@@ -161,7 +161,7 @@ async function renderAttendanceTable() {
         const updated = snap.exists() ? snap.data() : {};
         updated[player] = cb.checked;
         await setDoc(docRef, updated);
-      };
+      });
       const td = document.createElement("td");
       td.appendChild(cb);
       row.appendChild(td);
