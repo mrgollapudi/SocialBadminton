@@ -102,7 +102,9 @@ async function renderAttendanceTable() {
   container.appendChild(table);
 }
 
-function getAllTuesdays(parseInt(year), parseInt(month)) {
+function getAllTuesdays(year, month) {
+  year = parseInt(year);
+  month = parseInt(month);
   const result = [];
   const d = new Date(year, month, 1);
   while (d.getMonth() === parseInt(month)) {
@@ -203,4 +205,4 @@ window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
 window.applyMonthlyFee = applyMonthlyFee;
 window.generateMonthlyBills = generateMonthlyBills;
-//12:20AM
+//12:23AM
