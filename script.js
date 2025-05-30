@@ -38,7 +38,7 @@ async function renderPlayerList() {
   const players = await loadPlayers();
   players.forEach(({ name, mobile }) => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${name}</td><td>${mobile}</td>`;
+    row.innerHTML = `<td>${player.name}</td><td>${player.mobile}</td>`;
     list.appendChild(row);
   });
 }
@@ -104,8 +104,8 @@ function getAllTuesdays(year, month) {
   const d = new Date(year, month, 1);
   while (d.getMonth() === parseInt(month)) {
     if (d.getDay() === 2) {
-      result.push(new Date(d).toISOString().split('T')[0]);
-      result.push(d.toISOString().split("T")[0]);
+      const dateStr = new Date(d).toISOString().split("T")[0];
+      result.push(dateStr);
     }
     d.setDate(d.getDate() + 1);
   }
