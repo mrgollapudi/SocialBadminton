@@ -253,71 +253,13 @@ window.addEventListener("DOMContentLoaded", () => {
   loadMonthlyFee();
 });
 
-async function renderDashboard() {
-  const dashboardContainer = document.getElementById("dashboardTableContainer");
-  const chartCanvas = document.getElementById("attendanceChart");
-  dashboardContainer.innerHTML = "";
-  chartCanvas?.getContext("2d").clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+);
 
-  const attendanceSnap = await getDocs(collection(db, "attendance"));
-  const summary = {};
-
-  attendanceSnap.forEach(doc => {
-    const date = doc.id;
-    const data = doc.data();
-    summary[date] = Object.values(data).filter(v => v === true).length;
-  });
-
-  const table = document.createElement("table");
-  table.className = "table table-striped";
-  const thead = document.createElement("thead");
-  thead.innerHTML = "<tr><th>Date</th><th>Players Present</th></tr>";
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-  const dates = Object.keys(summary).sort();
-  const counts = [];
-
-  dates.forEach(date => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${date}</td><td>${summary[date]}</td>`;
-    tbody.appendChild(tr);
-    counts.push(summary[date]);
-  });
-
-  table.appendChild(tbody);
-  dashboardContainer.appendChild(table);
-
-  new Chart(chartCanvas, {
-    type: 'bar',
-    data: {
-      labels: dates,
-      datasets: [{
-        label: 'Players Present',
-        data: counts,
-        backgroundColor: 'rgba(54, 162, 235, 0.6)'
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          precision: 0
-        }
-      }
-    }
-  });
-}
-
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const dashboardTab = document.querySelector('a[href="#dashboardTab"]');
-  if (dashboardTab) {
-    dashboardTab.addEventListener("click", () => {
-      renderDashboard();
-    });
-  }
+  dashboardTab?.addEventListener("click", () => {
+    renderDashboard();
+  });
 });
 
 async function renderDashboard() {
@@ -342,7 +284,6 @@ async function renderDashboard() {
     monthlySummary[monthKey] += count;
   });
 
-  // Table
   const table = document.createElement("table");
   table.className = "table table-striped";
   table.innerHTML = "<thead><tr><th>Date</th><th>Attendance Count</th></tr></thead>";
@@ -356,7 +297,6 @@ async function renderDashboard() {
   table.appendChild(tbody);
   container.appendChild(table);
 
-  // Graph
   const ctx = chartCanvas.getContext("2d");
   new Chart(ctx, {
     type: 'bar',
@@ -377,7 +317,6 @@ async function renderDashboard() {
   });
 }
 
-// Fix generateBills to only use casual fee * days
 async function generateBills() {
   const year = document.getElementById("yearSelect").value;
   const month = document.getElementById("monthSelect").value;
