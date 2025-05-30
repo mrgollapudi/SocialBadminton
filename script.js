@@ -74,7 +74,6 @@ async function renderAttendanceTable() {
 
   const tuesdays = getAllTuesdays(parseInt(year), parseInt(month));
 
-  const container = document.getElementById("attendanceTableContainer");
   container.innerHTML = "";
 
   const table = document.createElement("table");
