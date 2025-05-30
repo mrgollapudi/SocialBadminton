@@ -51,30 +51,12 @@
         </div>
       </div>
 
-      <div class="tab-pane fade" id="feesTab">
-        <div class="row mb-3">
-          <div class="col">
-            <label for="feeYear" class="form-label">Year</label>
-            <select id="feeYear" name="feeYear" class="form-select form-select-sm mb-2"></select>
-          </div>
-          <div class="col">
-            <label for="feeMonth" class="form-label">Month</label>
-            <select id="feeMonth" name="feeMonth" class="form-select form-select-sm mb-2"></select>
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col">
-            <label for="regularFee" class="form-label">Regular Fee</label>
-            <input type="number" id="regularFee" name="regularFee" class="form-control" value="11">
-          </div>
-          <div class="col">
-            <label for="casualFee" class="form-label">Casual Fee</label>
-            <input type="number" id="casualFee" name="casualFee" class="form-control" value="13">
-          </div>
-        </div>
-        <button class="btn btn-success mb-3" onclick="applyMonthlyFee()">Apply Monthly Fee</button>
-        <div id="feesTableContainer"></div>
-      </div>
+     <div class="tab-pane fade" id="feesTab">
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle text-center" id="feesTableContainer">
+      <!-- Filled dynamically by JS -->
+    </table>
+  </div>
 
       <div class="tab-pane fade" id="billingTab">
         <div class="row mb-3">
