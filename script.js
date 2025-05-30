@@ -38,7 +38,7 @@ async function renderPlayerList() {
   const players = await loadPlayers();
   players.forEach(({ name, mobile }) => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${player.name}</td><td>${player.mobile}</td>`;
+    row.innerHTML = `<td>${name}</td><td>${mobile}</td>`;
     list.appendChild(row);
   });
 }
