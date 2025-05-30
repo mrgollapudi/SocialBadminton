@@ -1,4 +1,6 @@
+
 const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec"; // Replace with your deployed Google Apps Script Web App URL
+
 
 async function safeFetchJSON(url) {
   const res = await fetch(url);
@@ -59,12 +61,19 @@ async function renderFeesTable() {
   container.appendChild(table);
 }
 
+
 async function renderAttendanceTable() {
-  const year = document.getElementById("yearSelect").value;
-  const month = document.getElementById("monthSelect").value;
+  const year = document.getElementById("yearSelect")?.value;
+  const month = document.getElementById("monthSelect")?.value;
+  const container = document.getElementById("attendanceTableContainer");
+  if (!year || !month || !container) return;
+
   const players = await loadPlayers();
   const attendance = await loadAttendance();
+  if (!Array.isArray(players) || !Array.isArray(attendance)) return;
+
   const tuesdays = getAllTuesdays(parseInt(year), parseInt(month));
+
   const container = document.getElementById("attendanceTableContainer");
   container.innerHTML = "";
 
