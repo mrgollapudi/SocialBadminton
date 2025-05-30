@@ -1,6 +1,14 @@
+function toAESTDateString(date) {
+  const [day, month, year] = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date(date)).split('/');
+  return `${year}-${month}`;
+}
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec"; // Replace with your deployed Google Apps Script Web App URL
-
+const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec";
 
 async function safeFetchJSON(url) {
   const res = await fetch(url);
@@ -13,12 +21,10 @@ async function safeFetchJSON(url) {
   }
 }
 
-// Utility: Format month
 function formatMonth(year, month) {
   return `${year}-${String(month).padStart(2, "0")}`;
 }
 
-// Load helpers
 async function loadPlayers() {
   return await safeFetchJSON(`${API_URL}?action=getPlayers`);
 }
@@ -31,49 +37,82 @@ async function loadFees() {
   return await safeFetchJSON(`${API_URL}?action=getFees`);
 }
 
-// UI rendering
 async function renderPlayerList() {
-  const list = document.getElementById("playerList");
-  list.innerHTML = "";
-  const players = await loadPlayers();
+  const table = document.getElementById("playerListTable");
+  table.innerHTML = "";
+
+  // Create table header
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr class="table-primary">
+      <th>Player Name</th>
+      <th>Mobile</th>
+      <th>Action</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+
+  // Load and sort players alphabetically by name
+  const players = (await loadPlayers()).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  // Create body
+  const tbody = document.createElement("tbody");
+
   players.forEach(({ name, mobile }) => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${name}</td><td>${mobile}</td>`;
-    list.appendChild(row);
+    row.innerHTML = `
+      <td>${name}</td>
+      <td>${mobile}</td>
+      <td>
+        <button class="btn btn-sm btn-danger" onclick="deletePlayer('${name}', '${mobile}')">
+          Delete
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
   });
+
+  table.appendChild(tbody);
 }
 
-async function renderFeesTable() {
-  const fees = await loadFees();
-  const year = document.getElementById("feeYear").value;
-  const month = String(document.getElementById("feeMonth").value).padStart(2, "0");
-  const selected = `${year}-${month}`;
-  const container = document.getElementById("feesTableContainer");
-  container.innerHTML = "";
-  const table = document.createElement("table");
-  table.className = "table table-bordered";
-  table.innerHTML = `
-    <thead><tr><th>Month</th><th>Regular</th><th>Casual</th></tr></thead>
-    <tbody>${fees.filter(f => f.month === selected).map(f => `
-      <tr><td>${f.month}</td><td>${f.regular}</td><td>${f.casual}</td></tr>
-    `).join("")}</tbody>
-  `;
-  container.appendChild(table);
+async function deletePlayer(name, mobile) {
+  if (!confirm(`Delete ${name}?`)) return;
+  await fetch(`${API_URL}?action=deletePlayer&name=${encodeURIComponent(name)}&mobile=${encodeURIComponent(mobile)}`);
+  await renderPlayerList();
 }
 
+
+
+async function 
+renderFeesTable() {
+  loadFees().then(fees => {
+    const container = document.getElementById("feesTableContainer");
+    container.innerHTML = "";
+    const table = document.createElement("table");
+    table.className = "table table-bordered table-striped";
+    table.innerHTML = `
+      <thead><tr><th>Month</th><th>Regular</th><th>Casual</th></tr></thead>
+      <tbody>
+        ${fees.map(f => `
+          <tr><td>${toAESTDateString(f.month)}</td><td>${f.regular}</td><td>${f.casual}</td></tr>
+        `).join("")}
+      </tbody>
+    `;
+    container.appendChild(table);
+  });
+
+
+}
 
 async function renderAttendanceTable() {
-  const year = document.getElementById("yearSelect")?.value;
-  const month = document.getElementById("monthSelect")?.value;
-  const container = document.getElementById("attendanceTableContainer");
-  if (!year || !month || !container) return;
-
+  const year = document.getElementById("yearSelect").value;
+  const month = document.getElementById("monthSelect").value;
   const players = await loadPlayers();
   const attendance = await loadAttendance();
-  if (!Array.isArray(players) || !Array.isArray(attendance)) return;
-
   const tuesdays = getAllTuesdays(parseInt(year), parseInt(month));
-
+  const container = document.getElementById("attendanceTableContainer");
   container.innerHTML = "";
 
   const table = document.createElement("table");
@@ -115,27 +154,22 @@ function getAllTuesdays(year, month) {
   const d = new Date(year, month, 1);
   while (d.getMonth() === month) {
     if (d.getDay() === 2) {
-      const dateStr = new Date(d).toISOString().split("T")[0];
+      const dateStr = toAESTDateString(new Date(d));
       result.push(dateStr);
     }
+    d.setDate(d.getDate() + 1);
+  }
+  return result;
+}
 
-// Submit helpers (mock only - requires Apps Script support for POST)
 async function submitAttendance(date, player, present) {
   await fetch(`${API_URL}?action=markAttendance&date=${date}&player=${player}&present=${present ? "Yes" : "No"}`);
+}
 
 async function submitPlayer(name, mobile) {
   await fetch(`${API_URL}?action=addPlayer&name=${encodeURIComponent(name)}&mobile=${encodeURIComponent(mobile)}`);
-
-async function applyMonthlyFee() {
-  const year = document.getElementById("feeYear").value;
-  const month = document.getElementById("feeMonth").value;
-  const regular = document.getElementById("regularFee").value;
-  const casual = document.getElementById("casualFee").value;
-  const monthKey = formatMonth(year, String(month).padStart(2, "0"));
-  await fetch(`${API_URL}?action=applyFee&month=${monthKey}&regular=${regular}&casual=${casual}`);
-  alert("Fee saved.");
-  renderFeesTable();
 }
+
 
 async function generateMonthlyBills() {
   const year = document.getElementById("billingYearSelect").value;
@@ -176,6 +210,8 @@ function populateSelectors() {
   const months = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
   months.forEach((m, i) => {
+    [monthSel, fm, bm].forEach(sel => sel?.appendChild(new Option(m, i)));
+  });
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -186,9 +222,6 @@ function populateSelectors() {
   if (fm) fm.value = currentMonth;
   if (by) by.value = currentYear;
   if (bm) bm.value = currentMonth;
-
-    [monthSel, fm, bm].forEach(sel => sel?.appendChild(new Option(m, i)));
-  });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -196,94 +229,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   await renderPlayerList();
   await renderFeesTable();
   await renderAttendanceTable();
-  await renderDashboard();
-  // renderDashboard function not defined yet
 });
 
-// expose globally for buttons
 window.renderPlayerList = renderPlayerList;
 window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
-window.applyMonthlyFee = applyMonthlyFee;
 window.generateMonthlyBills = generateMonthlyBills;
-
-
-
-async function renderDashboard() {
-  const players = await loadPlayers();
-  const attendance = await loadAttendance();
-
-  const playerNames = players.map(p => p.name);
-  const monthSet = new Set();
-
-  const attendanceMap = {};
-
-  attendance.forEach(entry => {
-    const month = toAESTDateString(entry.date);
-    monthSet.add(month);
-    if (!attendanceMap[entry.player]) attendanceMap[entry.player] = {};
-    if (!attendanceMap[entry.player][month]) attendanceMap[entry.player][month] = 0;
-    if (entry.present === "Yes") attendanceMap[entry.player][month]++;
-  });
-
-  const months = Array.from(monthSet).sort();
-  const table = document.createElement("table");
-  table.className = "table table-bordered table-striped text-center align-middle";
-  const thead = document.createElement("thead");
-  const headerRow = document.createElement("tr");
-  headerRow.innerHTML = "<th>Player</th>" + months.map(m => `<th>${m}</th>`).join("");
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-  playerNames.forEach(player => {
-    const row = document.createElement("tr");
-    row.innerHTML = `<td>${player}</td>` + months.map(month => {
-      const count = attendanceMap[player]?.[month] || 0;
-      return `<td>${count}</td>`;
-    }).join("");
-    tbody.appendChild(row);
-  });
-
-  table.appendChild(tbody);
-  const container = document.getElementById("dashboardTableContainer");
-  container.innerHTML = "";
-  container.appendChild(table);
-
-  // Render graph
-  const ctx = document.getElementById("attendanceChart").getContext("2d");
-  if (window.attendanceChartInstance) {
-    window.attendanceChartInstance.destroy();
-  }
-  const datasets = playerNames.map(player => ({
-    label: player,
-    data: months.map(month => attendanceMap[player]?.[month] || 0),
-    borderWidth: 1,
-    fill: false
-  }));
-
-  window.attendanceChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: months,
-      datasets
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'top'
-        },
-        title: {
-          display: true,
-          text: 'Monthly Attendance Summary'
-        }
-      }
-    }
-  });
-}
-
-window.renderDashboard = renderDashboard;}
-}
-}
-}
+//1:40
