@@ -2,136 +2,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Social Badminton Group</title>
+  <meta charset="UTF-8">
+  <title>Badminton Group Manager</title>
   <link rel="icon" type="image/png" href="player.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container mt-4">
-    <div class="p-4 bg-primary text-white rounded shadow-sm text-center mb-4">
-      <h1 class="display-5 fw-bold">🏸 Social Badminton Group 🏸</h1>
-      <p class="lead mb-0">@ YMCA Springfield Central</p>
-    </div>
+  <div class="container py-4">
+    <h2 class="mb-4 text-center">🏸 Badminton Group Manager</h2>
 
-    <ul class="nav nav-tabs">
-      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#dashboardTab">Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#playersTab">Add Players</a></li>
+    <ul class="nav nav-tabs mb-3" id="mainTabs">
+      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#attendanceTab">Attendance</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#playersTab">Players</a></li>
       <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#feesTab">Set Fees</a></li>
       <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#billingTab">Billing</a></li>
-      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#attendanceTab">Attendance</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#dashboardTab">Dashboard</a></li>
     </ul>
 
     <div class="tab-content">
-      <div class="tab-pane fade show active" id="dashboardTab">
-        <div class="mt-4">
-          <h4>📊 Attendance Summary</h4>
-          <div id="dashboardTableContainer" class="table-responsive mt-3"></div>
-          <canvas id="attendanceChart" style="max-height:400px;"></canvas>
+      <div class="tab-pane fade show active" id="attendanceTab">
+        <div class="row mb-3">
+          <div class="col">
+            <label for="yearSelect" class="form-label">Year</label>
+            <select id="yearSelect" class="form-select"></select>
+          </div>
+          <div class="col">
+            <label for="monthSelect" class="form-label">Month</label>
+            <select id="monthSelect" class="form-select"></select>
+          </div>
         </div>
+        <div id="attendanceTableContainer"></div>
       </div>
 
       <div class="tab-pane fade" id="playersTab">
-        <div class="mt-3">
-          <label class="form-label">Player Names (comma-separated)</label>
-          <input type="text" id="playerInput" class="form-control mb-2" />
-          <label class="form-label">Mobile Number (1 per player, comma-separated in same order)</label>
-          <input type="text" id="mobileInput" class="form-control mb-2" />
-          <button class="btn btn-primary" onclick="addPlayers()">Add Players</button>
+        <div class="input-group mb-3">
+          <input type="text" id="playerName" class="form-control" placeholder="Player Name">
+          <input type="text" id="playerMobile" class="form-control" placeholder="Mobile Number">
+          <button class="btn btn-primary" onclick="submitPlayer(playerName.value, playerMobile.value)">Add Player</button>
         </div>
-        <ul id="playerList" class="list-group mt-3"></ul>
+        <ul id="playerList" class="list-group"></ul>
       </div>
 
-
-<!-- [omitted content above remains the same as previous index.html] -->
-<div class="tab-pane fade" id="feesTab">
-  <div class="row mt-3">
-    <div class="col">
-      <label for="feeYear" class="form-label">Year</label>
-      <select id="feeYear" class="form-select"></select>
-    </div>
-    <div class="col">
-      <label for="feeMonth" class="form-label">Month</label>
-      <select id="feeMonth" class="form-select"></select>
-    </div>
-  </div>
-  <div class="row mt-3">
-    <div class="col">
-      <label for="regularFee" class="form-label">Regular Fee</label>
-      <input type="number" id="regularFee" class="form-control" value="11" />
-    </div>
-    <div class="col">
-      <label for="casualFee" class="form-label">Casual Fee</label>
-      <input type="number" id="casualFee" class="form-control" value="13" />
-    </div>
-  </div>
-  <button class="btn btn-success mt-3" onclick="applyMonthlyFee()">Apply Monthly Fee</button>
-
-  <div id="feesTableContainer" class="table-responsive mt-4"></div>
-</div>
-<!-- [rest of the content remains the same] -->
-      <div class="tab-pane fade" id="attendanceTab">
-        <div class="row mt-3">
+      <div class="tab-pane fade" id="feesTab">
+        <div class="row mb-3">
           <div class="col">
-            <label class="form-label">Year</label>
-            <select id="yearSelect" class="form-select" onchange="renderAttendanceTable()"></select>
+            <label for="feeYear" class="form-label">Year</label>
+            <select id="feeYear" class="form-select"></select>
           </div>
           <div class="col">
-            <label class="form-label">Month</label>
-            <select id="monthSelect" class="form-select" onchange="renderAttendanceTable()"></select>
+            <label for="feeMonth" class="form-label">Month</label>
+            <select id="feeMonth" class="form-select"></select>
           </div>
         </div>
-        <div class="form-check mt-3">
-          <input class="form-check-input" type="checkbox" id="showPast" checked onchange="toggleShowPast()" />
-          <label class="form-check-label" for="showPast">Show Past Dates</label>
+        <div class="row mb-3">
+          <div class="col">
+            <label for="regularFee" class="form-label">Regular Fee</label>
+            <input type="number" id="regularFee" class="form-control" value="11">
+          </div>
+          <div class="col">
+            <label for="casualFee" class="form-label">Casual Fee</label>
+            <input type="number" id="casualFee" class="form-control" value="13">
+          </div>
         </div>
-        <div id="attendanceTableContainer" class="table-responsive mt-3"></div>
-        <button class="btn btn-info mt-3" onclick="generateBills()">Generate Monthly Bills</button>
-        <ul id="billList" class="list-group mt-3"></ul>
+        <button class="btn btn-success mb-3" onclick="applyMonthlyFee()">Apply Monthly Fee</button>
+        <div id="feesTableContainer"></div>
       </div>
-    </div>
-  </div>
-
 
       <div class="tab-pane fade" id="billingTab">
-        <div class="mt-3">
-          <h4>💳 Generate Monthly Bills</h4>
-          <div class="row">
-            <div class="col">
-              <label class="form-label">Year</label>
-              <select id="billingYearSelect" class="form-select"></select>
-            </div>
-            <div class="col">
-              <label class="form-label">Month</label>
-              <select id="billingMonthSelect" class="form-select"></select>
-            </div>
+        <div class="row mb-3">
+          <div class="col">
+            <label for="billingYearSelect" class="form-label">Year</label>
+            <select id="billingYearSelect" class="form-select"></select>
           </div>
-          <button class="btn btn-info mt-3" onclick="generateMonthlyBills()">Generate Bills</button>
-          <ul id="billingResultList" class="list-group mt-3"></ul>
+          <div class="col">
+            <label for="billingMonthSelect" class="form-label">Month</label>
+            <select id="billingMonthSelect" class="form-select"></select>
+          </div>
+        </div>
+        <button class="btn btn-info mb-3" onclick="generateMonthlyBills()">Generate Bills</button>
+        <ul id="billingResultList" class="list-group"></ul>
+      </div>
+
+      <div class="tab-pane fade" id="dashboardTab">
+        <div class="mt-3">
+          <h4>📊 Attendance Dashboard</h4>
+          <div id="dashboardTableContainer" class="mb-3"></div>
+          <canvas id="attendanceChart" height="200"></canvas>
         </div>
       </div>
-  <!-- Firebase config and db setup -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    </div>
+  </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAPJjI15ASh2XJhh1YAc9KYXQmPVnmLWgo",
-      authDomain: "badminton-group-springfield.firebaseapp.com",
-      projectId: "badminton-group-springfield",
-      storageBucket: "badminton-group-springfield.firebasestorage.app",
-      messagingSenderId: "483085704429",
-      appId: "1:483085704429:web:f0a07cb9aae99c960740e4",
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.db = db;
-  </script>
-
-  <script type="module" src="./script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
