@@ -285,6 +285,7 @@ window.addEventListener("DOMContentLoaded", () => {
   loadMonthlyFee();
   renderFeesTable();
   renderDashboard();
+  populateBillingSelectors();
 
   const dashboardTab = document.querySelector('a[href="#dashboardTab"]');
   dashboardTab?.addEventListener("click", renderDashboard);
@@ -308,10 +309,49 @@ async function renderFeesTable() {
   feesSnap.forEach(docSnap => {
     const row = document.createElement("tr");
     const { regular, casual } = docSnap.data();
-    row.innerHTML = `<td>${docSnap.id}</td><td>$${regular}</td><td>$${casual}</td>`;
+    const formattedMonth = docSnap.id.split("-").map((v, i) => i === 1 ? v.padStart(2, "0") : v).join("-");
+    row.innerHTML = `<td>${formattedMonth}</td><td>$${regular}</td><td>$${casual}</td>`;
     tbody.appendChild(row);
   });
 
   table.appendChild(tbody);
   container.appendChild(table);
+}
+
+async function generateMonthlyBills() {
+  const year = document.getElementById("billingYearSelect").value;
+  const month = document.getElementById("billingMonthSelect").value;
+  const dateKeys = getAllTuesdays(year, month).map(d => d.toISOString().split("T")[0]);
+  const feeSnap = await getDoc(doc(db, "monthlyFees", `${year}-${month}`));
+  const casualFee = feeSnap.exists() ? (feeSnap.data().casual || 13) : 13;
+  const playerSnap = await getDocs(collection(db, "players"));
+  const resultList = document.getElementById("billingResultList");
+  resultList.innerHTML = "";
+
+  for (const playerDoc of playerSnap.docs) {
+    const player = playerDoc.id;
+    let attended = 0;
+    for (const date of dateKeys) {
+      const snap = await getDoc(doc(db, "attendance", date));
+      if (snap.exists() && snap.data()[player]) attended++;
+    }
+    const total = attended * casualFee;
+    const li = document.createElement("li");
+    li.className = "list-group-item";
+    li.textContent = `${player}: $${total.toFixed(2)} (${attended} Tuesdays × $${casualFee})`;
+    resultList.appendChild(li);
+  }
+}
+
+function populateBillingSelectors() {
+  const yearSel = document.getElementById("billingYearSelect");
+  const monthSel = document.getElementById("billingMonthSelect");
+  for (let y = 2025; y <= 2027; y++) {
+    yearSel.appendChild(new Option(y, y));
+  }
+  const months = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  months.forEach((m, i) => {
+    monthSel.appendChild(new Option(m, i));
+  });
 }
