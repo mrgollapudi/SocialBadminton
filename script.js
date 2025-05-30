@@ -8,17 +8,17 @@ function formatMonth(year, month) {
 
 // Load helpers
 async function loadPlayers() {
-  const res = await fetch(\`\${API_URL}?action=getPlayers\`);
+  const res = await fetch(`\${API_URL}?action=getPlayers`);
   return await res.json();
 }
 
 async function loadAttendance() {
-  const res = await fetch(\`\${API_URL}?action=getAttendance\`);
+  const res = await fetch(`\${API_URL}?action=getAttendance`);
   return await res.json();
 }
 
 async function loadFees() {
-  const res = await fetch(\`\${API_URL}?action=getFees\`);
+  const res = await fetch(`\${API_URL}?action=getFees`);
   return await res.json();
 }
 
@@ -30,7 +30,7 @@ async function renderPlayerList() {
   players.forEach(({ name, mobile }) => {
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
-    li.textContent = \`\${name} (\${mobile})\`;
+    li.textContent = `\${name} (\${mobile})`;
     list.appendChild(li);
   });
 }
@@ -41,12 +41,12 @@ async function renderFeesTable() {
   container.innerHTML = "";
   const table = document.createElement("table");
   table.className = "table table-bordered";
-  table.innerHTML = \`
+  table.innerHTML = `
     <thead><tr><th>Month</th><th>Regular</th><th>Casual</th></tr></thead>
-    <tbody>\${fees.map(f => \`
+    <tbody>\${fees.map(f => `
       <tr><td>\${f.month}</td><td>\${f.regular}</td><td>\${f.casual}</td></tr>
-    \`).join("")}</tbody>
-  \`;
+    `).join("")}</tbody>
+  `;
   container.appendChild(table);
 }
 
@@ -65,7 +65,7 @@ async function renderAttendanceTable() {
   const headRow = document.createElement("tr");
   headRow.innerHTML = "<th>Player</th>";
   tuesdays.forEach(date => {
-    headRow.innerHTML += \`<th>\${date}</th>\`;
+    headRow.innerHTML += `<th>\${date}</th>`;
   });
   thead.appendChild(headRow);
   table.appendChild(thead);
@@ -73,7 +73,7 @@ async function renderAttendanceTable() {
   const tbody = document.createElement("tbody");
   players.forEach(player => {
     const row = document.createElement("tr");
-    row.innerHTML = \`<td>\${player.name}</td>\`;
+    row.innerHTML = `<td>\${player.name}</td>`;
     tuesdays.forEach(date => {
       const match = attendance.find(a => a.date === date && a.player === player.name);
       const td = document.createElement("td");
@@ -105,11 +105,11 @@ function getAllTuesdays(year, month) {
 
 // Submit helpers (mock only - requires Apps Script support for POST)
 async function submitAttendance(date, player, present) {
-  await fetch(\`\${API_URL}?action=markAttendance&date=\${date}&player=\${player}&present=\${present ? "Yes" : "No"}\`);
+  await fetch(`\${API_URL}?action=markAttendance&date=\${date}&player=\${player}&present=\${present ? "Yes" : "No"}`);
 }
 
 async function submitPlayer(name, mobile) {
-  await fetch(\`\${API_URL}?action=addPlayer&name=\${encodeURIComponent(name)}&mobile=\${encodeURIComponent(mobile)}\`);
+  await fetch(`\${API_URL}?action=addPlayer&name=\${encodeURIComponent(name)}&mobile=\${encodeURIComponent(mobile)}`);
 }
 
 async function applyMonthlyFee() {
@@ -118,7 +118,7 @@ async function applyMonthlyFee() {
   const regular = document.getElementById("regularFee").value;
   const casual = document.getElementById("casualFee").value;
   const monthKey = formatMonth(year, month);
-  await fetch(\`\${API_URL}?action=applyFee&month=\${monthKey}&regular=\${regular}&casual=\${casual}\`);
+  await fetch(`\${API_URL}?action=applyFee&month=\${monthKey}&regular=\${regular}&casual=\${casual}`);
   alert("Fee saved.");
   renderFeesTable();
 }
@@ -142,7 +142,7 @@ async function generateMonthlyBills() {
     const total = attended * rate;
     const li = document.createElement("li");
     li.className = "list-group-item";
-    li.textContent = \`\${player.name}: $ \${total.toFixed(2)} (\${attended} × \$\${rate})\`;
+    li.textContent = `\${player.name}: $ \${total.toFixed(2)} (\${attended} × \$\${rate})`;
     resultList.appendChild(li);
   });
 }
