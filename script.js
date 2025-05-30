@@ -1,9 +1,9 @@
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec"; // Replace with your deployed Google Apps Script Web App URL
-                 
+const API_URL = "https://script.google.com/macros/s/AKfycbzDZUIOix1oDXT08j_FxaQy_Z5212A3rZWx_z1KJNL5qCbJZ4hYQHLN52TL_WXJQXOQ/exec"; 
+
 // Utility: Format month
 function formatMonth(year, month) {
-  return \`\${year}-\${String(month).padStart(2, "0")}\`;
+  return `${year}-${String(month).padStart(2, "0")}`;
 }
 
 // Load helpers
