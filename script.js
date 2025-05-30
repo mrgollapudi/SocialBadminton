@@ -43,8 +43,8 @@ async function addPlayers() {
       continue;
     }
     await setDoc(doc(db, "players", name), { name, mobile };
-    console.log(`Added: ${name} (${mobile}`);
-  }
+    await setDoc(doc(db, "players", name), { name, mobile });
+    console.log(`Added: ${name} (${mobile})`);
 
   document.getElementById("playerInput").value = "";
   document.getElementById("mobileInput").value = "";
