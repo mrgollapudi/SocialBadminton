@@ -303,14 +303,16 @@ async function renderFeesTable() {
 
   const table = document.createElement("table");
   table.className = "table table-striped table-bordered";
-  table.innerHTML = "<thead><tr><th>Month</th><th>Regular Fee</th><th>Casual Fee</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th>Month</th><th>Regular Fee</th><th>Casual Fee</th><th>Action</th></tr></thead>";
   const tbody = document.createElement("tbody");
 
   feesSnap.forEach(docSnap => {
     const row = document.createElement("tr");
     const { regular, casual } = docSnap.data();
     const formattedMonth = docSnap.id.split("-").map((v, i) => i === 1 ? v.padStart(2, "0") : v).join("-");
-    row.innerHTML = `<td>${formattedMonth}</td><td>$${regular}</td><td>$${casual}</td>`;
+    
+row.innerHTML = `<td>${formattedMonth}</td><td>$${regular}</td><td>$${casual}</td><td><button class='btn btn-sm btn-danger' onclick="deleteMonthlyFee('${docSnap.id}')">Delete</button></td>`;
+
     tbody.appendChild(row);
   });
 
@@ -365,3 +367,14 @@ window.renderAttendanceTable = renderAttendanceTable;
 window.renderPlayerList = renderPlayerList;
 window.renderDashboard = renderDashboard;
 window.generateMonthlyBills = generateMonthlyBills;
+
+
+async function deleteMonthlyFee(key) {
+  if (confirm(`Delete fees for ${key}?`)) {
+    await deleteDoc(doc(db, "monthlyFees", key));
+    alert(`Deleted fees for ${key}`);
+    renderFeesTable();
+  }
+}
+
+window.deleteMonthlyFee = deleteMonthlyFee;
