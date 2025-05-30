@@ -107,11 +107,15 @@ function getAllTuesdays(year, month) {
   month = parseInt(month);
   const result = [];
   const d = new Date(year, month, 1);
-  while (d.getMonth() === parseInt(month)) {
+  while (d.getMonth() === month) {
     if (d.getDay() === 2) {
       const dateStr = new Date(d).toISOString().split("T")[0];
       result.push(dateStr);
     }
+    d.setDate(d.getDate() + 1);
+  }
+  return result;
+}
     d.setDate(d.getDate() + 1);
   }
   return result;
@@ -205,4 +209,4 @@ window.renderAttendanceTable = renderAttendanceTable;
 window.renderFeesTable = renderFeesTable;
 window.applyMonthlyFee = applyMonthlyFee;
 window.generateMonthlyBills = generateMonthlyBills;
-//12:23AM
+//12:32am
